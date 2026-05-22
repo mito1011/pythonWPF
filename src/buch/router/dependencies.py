@@ -1,14 +1,15 @@
-from typing import Callable
-from src.buch.repository.mock_repo import repo, autor_repo, verlag_repo
+from src.buch.service.book_service import BookService, book_service
+from src.buch.service.autor_service import AutorService, autor_service
+from src.buch.service.verlag_service import VerlagService, verlag_service
 
 
-def get_book_repo() -> Callable:
-    return repo
+def get_book_service() -> BookService:
+    return book_service
 
 
-def get_autor_repo() -> Callable:
-    return autor_repo
+def get_autor_service() -> AutorService:
+    return autor_service
 
 
-def get_verlag_repo() -> Callable:
-    return verlag_repo
+def get_verlag_service() -> VerlagService:
+    return verlag_service
