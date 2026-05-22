@@ -5,7 +5,7 @@ from src.buch.router.dependencies import get_autor_service
 from src.buch.entity.autor_entity import Autor, AutorCreate, AutorUpdate
 from src.buch.service.autor_service import AutorService
 
-router = APIRouter(prefix="/autoren", tags=["Autoren"])
+router = APIRouter(prefix="/authors", tags=["Authors"])
 
 
 @router.get("/", response_model=List[Autor])
@@ -17,7 +17,7 @@ def list_autoren(service: AutorService = Depends(get_autor_service)):
 def get_autor(autor_id: int, service: AutorService = Depends(get_autor_service)):
     a = service.get_by_id(autor_id)
     if not a:
-        raise HTTPException(status_code=404, detail="Autor not found")
+        raise HTTPException(status_code=404, detail="Author not found")
     return a
 
 
@@ -30,7 +30,7 @@ def create_autor(autor: AutorCreate, service: AutorService = Depends(get_autor_s
 def update_autor(autor_id: int, autor: AutorCreate, service: AutorService = Depends(get_autor_service)):
     updated_autor = service.update(autor_id, autor)
     if not updated_autor:
-        raise HTTPException(status_code=404, detail="Autor not found")
+        raise HTTPException(status_code=404, detail="Author not found")
     return updated_autor
 
 
@@ -38,7 +38,7 @@ def update_autor(autor_id: int, autor: AutorCreate, service: AutorService = Depe
 def patch_autor(autor_id: int, autor: AutorUpdate, service: AutorService = Depends(get_autor_service)):
     patched_autor = service.patch(autor_id, autor)
     if not patched_autor:
-        raise HTTPException(status_code=404, detail="Autor not found")
+        raise HTTPException(status_code=404, detail="Author not found")
     return patched_autor
 
 
@@ -46,5 +46,5 @@ def patch_autor(autor_id: int, autor: AutorUpdate, service: AutorService = Depen
 def delete_autor(autor_id: int, service: AutorService = Depends(get_autor_service)):
     deleted = service.delete(autor_id)
     if not deleted:
-        raise HTTPException(status_code=404, detail="Autor not found")
+        raise HTTPException(status_code=404, detail="Author not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)

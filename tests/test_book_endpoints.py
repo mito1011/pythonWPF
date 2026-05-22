@@ -102,7 +102,7 @@ def test_book_error_responses():
 
 def test_create_update_patch_and_delete_autor():
     create_response = client.post(
-        "/autoren/",
+        "/authors/",
         json={
             "name": "Mann",
             "vorname": "Thomas",
@@ -117,7 +117,7 @@ def test_create_update_patch_and_delete_autor():
     assert created_autor["name"] == "Mann"
 
     update_response = client.put(
-        f"/autoren/{autor_id}",
+        f"/authors/{autor_id}",
         json={
             "name": "Kafka",
             "vorname": "Franz",
@@ -132,7 +132,7 @@ def test_create_update_patch_and_delete_autor():
     assert updated_autor["vorname"] == "Franz"
 
     patch_response = client.patch(
-        f"/autoren/{autor_id}",
+        f"/authors/{autor_id}",
         json={"nationalitaet": "Deutschsprachig"},
     )
 
@@ -141,17 +141,17 @@ def test_create_update_patch_and_delete_autor():
     assert patched_autor["nationalitaet"] == "Deutschsprachig"
     assert patched_autor["name"] == "Kafka"
 
-    delete_response = client.delete(f"/autoren/{autor_id}")
+    delete_response = client.delete(f"/authors/{autor_id}")
 
     assert delete_response.status_code == 204
-    assert client.get(f"/autoren/{autor_id}").status_code == 404
+    assert client.get(f"/authors/{autor_id}").status_code == 404
 
 
 def test_autor_error_responses():
-    assert client.get("/autoren/9999").status_code == 404
+    assert client.get("/authors/9999").status_code == 404
 
     update_response = client.put(
-        "/autoren/9999",
+        "/authors/9999",
         json={
             "name": "Unbekannt",
             "vorname": "Niemand",
@@ -159,13 +159,13 @@ def test_autor_error_responses():
     )
 
     assert update_response.status_code == 404
-    assert client.patch("/autoren/9999", json={"name": "Niemand"}).status_code == 404
-    assert client.delete("/autoren/9999").status_code == 404
+    assert client.patch("/authors/9999", json={"name": "Niemand"}).status_code == 404
+    assert client.delete("/authors/9999").status_code == 404
 
 
 def test_create_update_patch_and_delete_verlag():
     create_response = client.post(
-        "/verlage/",
+        "/publishers/",
         json={
             "name": "Test Verlag",
             "stadt": "Berlin",
@@ -180,7 +180,7 @@ def test_create_update_patch_and_delete_verlag():
     assert created_verlag["name"] == "Test Verlag"
 
     update_response = client.put(
-        f"/verlage/{verlag_id}",
+        f"/publishers/{verlag_id}",
         json={
             "name": "Updated Verlag",
             "stadt": "Hamburg",
@@ -195,7 +195,7 @@ def test_create_update_patch_and_delete_verlag():
     assert updated_verlag["stadt"] == "Hamburg"
 
     patch_response = client.patch(
-        f"/verlage/{verlag_id}",
+        f"/publishers/{verlag_id}",
         json={"land": "DE"},
     )
 
@@ -204,22 +204,22 @@ def test_create_update_patch_and_delete_verlag():
     assert patched_verlag["land"] == "DE"
     assert patched_verlag["name"] == "Updated Verlag"
 
-    delete_response = client.delete(f"/verlage/{verlag_id}")
+    delete_response = client.delete(f"/publishers/{verlag_id}")
 
     assert delete_response.status_code == 204
-    assert client.get(f"/verlage/{verlag_id}").status_code == 404
+    assert client.get(f"/publishers/{verlag_id}").status_code == 404
 
 
 def test_verlag_error_responses():
-    assert client.get("/verlage/9999").status_code == 404
+    assert client.get("/publishers/9999").status_code == 404
 
     update_response = client.put(
-        "/verlage/9999",
+        "/publishers/9999",
         json={
             "name": "Unbekannter Verlag",
         },
     )
 
     assert update_response.status_code == 404
-    assert client.patch("/verlage/9999", json={"name": "Niemand"}).status_code == 404
-    assert client.delete("/verlage/9999").status_code == 404
+    assert client.patch("/publishers/9999", json={"name": "Niemand"}).status_code == 404
+    assert client.delete("/publishers/9999").status_code == 404

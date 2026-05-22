@@ -55,16 +55,16 @@ Die API ist dann unter `http://127.0.0.1:8000` erreichbar.
 - `PUT /books/{book_id}`
 - `PATCH /books/{book_id}`
 - `DELETE /books/{book_id}`
-- `GET /autoren`
-- `POST /autoren`
-- `PUT /autoren/{autor_id}`
-- `PATCH /autoren/{autor_id}`
-- `DELETE /autoren/{autor_id}`
-- `GET /verlage`
-- `POST /verlage`
-- `PUT /verlage/{verlag_id}`
-- `PATCH /verlage/{verlag_id}`
-- `DELETE /verlage/{verlag_id}`
+- `GET /authors`
+- `POST /authors`
+- `PUT /authors/{author_id}`
+- `PATCH /authors/{author_id}`
+- `DELETE /authors/{author_id}`
+- `GET /publishers`
+- `POST /publishers`
+- `PUT /publishers/{publisher_id}`
+- `PATCH /publishers/{publisher_id}`
+- `DELETE /publishers/{publisher_id}`
 - `GET /books/view`
 
 Swagger UI: `http://127.0.0.1:8000/docs`
