@@ -4,28 +4,13 @@ Dieses Projekt enthält ein einfaches FastAPI-Grundgerüst.
 
 ## Vorbereitung
 
-1. Erstelle ein virtuelles Umfeld:
+1. Installiere die Abhängigkeiten mit `uv`:
 
 ```bash
-python -m venv .venv
+uv sync --dev
 ```
 
-2. Aktiviere das virtuelle Umfeld:
-
-- PowerShell:
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-- CMD:
-```cmd
-.\.venv\Scripts\activate.bat
-```
-
-3. Installiere die Abhängigkeiten:
-
-```bash
-pip install -r requirements.txt
-```
+`uv` erstellt dabei automatisch die virtuelle Umgebung `.venv`.
 
 ## Projektlayout
 
@@ -41,7 +26,7 @@ Das Projekt folgt dem `src/buch`-Layout mit einfachem MVC-Pattern:
 ## Starten der Anwendung
 
 ```bash
-uvicorn src.buch.main:app --reload
+uv run uvicorn src.buch.main:app --reload
 ```
 
 Die API ist dann unter `http://127.0.0.1:8000` erreichbar.
@@ -72,3 +57,9 @@ Für einen anderen Datenbankpfad kann die Umgebungsvariable `BUCH_DB_PATH` geset
 - `GET /books/view`
 
 Swagger UI: `http://127.0.0.1:8000/docs`
+
+## Tests
+
+```bash
+uv run pytest
+```

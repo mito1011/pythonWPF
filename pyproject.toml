@@ -1,0 +1,21 @@
+[project]
+name = "wpf-buch-api"
+version = "0.1.0"
+description = "FastAPI book API with SQLite persistence"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "jinja2",
+    "uvicorn[standard]",
+]
+
+[dependency-groups]
+dev = [
+    "httpx",
+    "pytest",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+cache_dir = ".pytest_cache_uv"
