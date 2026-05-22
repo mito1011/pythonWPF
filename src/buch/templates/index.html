@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Bücher</title>
+  </head>
+  <body>
+    <h1>Bücher (Mock)</h1>
+    <ul>
+      {% for book in books %}
+        <li><a href="/books/{{ book.id }}"><strong>{{ book.title }}</strong></a> von {{ book.author }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

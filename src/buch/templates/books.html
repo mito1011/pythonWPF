@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Bücher</title>
+  </head>
+  <body>
+    <h1>Bücher (Mock)</h1>
+    <ul>
+      {% for book in books %}
+        <li><strong>{{ book.title }}</strong> von {{ book.author }} — {{ book.description }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
