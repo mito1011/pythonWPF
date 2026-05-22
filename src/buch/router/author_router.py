@@ -3,6 +3,7 @@ from typing import List
 
 from src.buch.router.dependencies import get_author_service
 from src.buch.entity.author_entity import Author, AuthorCreate, AuthorUpdate
+from src.buch.repository.errors import ReferencedEntityError
 from src.buch.service.author_service import AuthorService
 
 router = APIRouter(prefix="/authors", tags=["Authors"])
@@ -44,7 +45,10 @@ def patch_author(author_id: int, author: AuthorUpdate, service: AuthorService = 
 
 @router.delete("/{author_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_author(author_id: int, service: AuthorService = Depends(get_author_service)):
-    deleted = service.delete(author_id)
+    try:
+        deleted = service.delete(author_id)
+    except ReferencedEntityError as exc:
+        raise HTTPException(status_code=409, detail=str(exc))
     if not deleted:
         raise HTTPException(status_code=404, detail="Author not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)

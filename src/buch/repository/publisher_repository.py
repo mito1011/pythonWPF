@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from src.buch.entity.publisher_entity import Publisher, PublisherCreate, PublisherUpdate
 from src.buch.repository.database import SQLiteDatabase, database
+from src.buch.repository.errors import ReferencedEntityError
 
 
 class PublisherSQLiteRepo:
@@ -79,7 +80,7 @@ class PublisherSQLiteRepo:
                 cursor = connection.execute("DELETE FROM publishers WHERE id = ?", (publisher_id,))
                 return cursor.rowcount > 0
         except sqlite3.IntegrityError:
-            return False
+            raise ReferencedEntityError("Publisher is still referenced by one or more books")
 
 
 publisher_repo = PublisherSQLiteRepo(database)

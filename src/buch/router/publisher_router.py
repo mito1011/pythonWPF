@@ -3,6 +3,7 @@ from typing import List
 
 from src.buch.router.dependencies import get_publisher_service
 from src.buch.entity.publisher_entity import Publisher, PublisherCreate, PublisherUpdate
+from src.buch.repository.errors import ReferencedEntityError
 from src.buch.service.publisher_service import PublisherService
 
 router = APIRouter(prefix="/publishers", tags=["Publishers"])
@@ -52,7 +53,10 @@ def patch_publisher(
 
 @router.delete("/{publisher_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_publisher(publisher_id: int, service: PublisherService = Depends(get_publisher_service)):
-    deleted = service.delete(publisher_id)
+    try:
+        deleted = service.delete(publisher_id)
+    except ReferencedEntityError as exc:
+        raise HTTPException(status_code=409, detail=str(exc))
     if not deleted:
         raise HTTPException(status_code=404, detail="Publisher not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)

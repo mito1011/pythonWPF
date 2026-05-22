@@ -107,6 +107,79 @@ def test_book_error_responses():
 
     assert invalid_patch_response.status_code == 400
 
+    invalid_update_author_response = client.put(
+        "/books/1",
+        json={
+            "title": "Invalid Update",
+            "author_id": 9999,
+            "publisher_id": 1,
+        },
+    )
+
+    assert invalid_update_author_response.status_code == 400
+
+    invalid_update_publisher_response = client.put(
+        "/books/1",
+        json={
+            "title": "Invalid Update",
+            "author_id": 1,
+            "publisher_id": 9999,
+        },
+    )
+
+    assert invalid_update_publisher_response.status_code == 400
+
+
+def test_patch_book_author_and_publisher():
+    create_response = client.post(
+        "/books/",
+        json={
+            "title": "Relationship Patch Book",
+            "author_id": 1,
+            "publisher_id": 1,
+        },
+    )
+    book_id = create_response.json()["id"]
+
+    patch_response = client.patch(
+        f"/books/{book_id}",
+        json={
+            "author_id": 2,
+            "publisher_id": 2,
+        },
+    )
+
+    assert patch_response.status_code == 200
+    patched_book = patch_response.json()
+    assert patched_book["author"]["id"] == 2
+    assert patched_book["publisher"]["id"] == 2
+
+    assert client.delete(f"/books/{book_id}").status_code == 204
+
+
+def test_created_book_is_visible_in_html_views():
+    title = "Visible HTML Book"
+    create_response = client.post(
+        "/books/",
+        json={
+            "title": title,
+            "author_id": 1,
+            "publisher_id": 1,
+            "description": "Rendered by templates",
+        },
+    )
+    book_id = create_response.json()["id"]
+
+    index_response = client.get("/")
+    books_view_response = client.get("/books/view")
+
+    assert index_response.status_code == 200
+    assert books_view_response.status_code == 200
+    assert title in index_response.text
+    assert title in books_view_response.text
+
+    assert client.delete(f"/books/{book_id}").status_code == 204
+
 
 def test_create_update_patch_and_delete_author():
     create_response = client.post(
@@ -171,6 +244,13 @@ def test_author_error_responses():
     assert client.delete("/authors/9999").status_code == 404
 
 
+def test_delete_referenced_author_returns_conflict():
+    response = client.delete("/authors/1")
+
+    assert response.status_code == 409
+    assert client.get("/authors/1").status_code == 200
+
+
 def test_create_update_patch_and_delete_publisher():
     create_response = client.post(
         "/publishers/",
@@ -231,3 +311,10 @@ def test_publisher_error_responses():
     assert update_response.status_code == 404
     assert client.patch("/publishers/9999", json={"name": "Niemand"}).status_code == 404
     assert client.delete("/publishers/9999").status_code == 404
+
+
+def test_delete_referenced_publisher_returns_conflict():
+    response = client.delete("/publishers/1")
+
+    assert response.status_code == 409
+    assert client.get("/publishers/1").status_code == 200

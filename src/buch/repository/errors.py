@@ -1,0 +1,2 @@
+class ReferencedEntityError(Exception):
+    pass
