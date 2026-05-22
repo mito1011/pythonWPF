@@ -1,9 +1,9 @@
 import sqlite3
 from typing import List, Optional
 
-from src.buch.entity.publisher_entity import Publisher, PublisherCreate, PublisherUpdate
-from src.buch.repository.database import SQLiteDatabase, database
-from src.buch.repository.errors import ReferencedEntityError
+from src.book.entity.publisher_entity import Publisher, PublisherCreate, PublisherUpdate
+from src.book.repository.database import SQLiteDatabase, database
+from src.book.repository.errors import ReferencedEntityError
 
 
 class PublisherSQLiteRepo:

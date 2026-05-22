@@ -1,12 +1,12 @@
 import sqlite3
 from typing import List, Optional
 
-from src.buch.entity.author_entity import Author
-from src.buch.entity.book_entity import Book, BookCreate, BookUpdate
-from src.buch.entity.publisher_entity import Publisher
-from src.buch.repository.author_repository import AuthorSQLiteRepo, author_repo
-from src.buch.repository.database import SQLiteDatabase, database
-from src.buch.repository.publisher_repository import PublisherSQLiteRepo, publisher_repo
+from src.book.entity.author_entity import Author
+from src.book.entity.book_entity import Book, BookCreate, BookUpdate
+from src.book.entity.publisher_entity import Publisher
+from src.book.repository.author_repository import AuthorSQLiteRepo, author_repo
+from src.book.repository.database import SQLiteDatabase, database
+from src.book.repository.publisher_repository import PublisherSQLiteRepo, publisher_repo
 
 
 class BookSQLiteRepo:

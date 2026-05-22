@@ -1,10 +1,10 @@
 from typing import List, Optional
 
-from src.buch.entity.book_entity import Book, BookCreate, BookUpdate
-from src.buch.repository.author_repository import AuthorSQLiteRepo, author_repo
-from src.buch.repository.book_repository import BookSQLiteRepo, repo as book_repo
-from src.buch.repository.publisher_repository import PublisherSQLiteRepo, publisher_repo
-from src.buch.service.email_service import EmailNotifier, email_notifier
+from src.book.entity.book_entity import Book, BookCreate, BookUpdate
+from src.book.repository.author_repository import AuthorSQLiteRepo, author_repo
+from src.book.repository.book_repository import BookSQLiteRepo, repo as book_repo
+from src.book.repository.publisher_repository import PublisherSQLiteRepo, publisher_repo
+from src.book.service.email_service import EmailNotifier, email_notifier
 
 class BookService:
     def __init__(

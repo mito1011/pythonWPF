@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from typing import List
 
-from src.buch.router.dependencies import get_publisher_service
-from src.buch.entity.publisher_entity import Publisher, PublisherCreate, PublisherUpdate
-from src.buch.repository.errors import ReferencedEntityError
-from src.buch.service.publisher_service import PublisherService
+from src.book.router.dependencies import get_publisher_service
+from src.book.entity.publisher_entity import Publisher, PublisherCreate, PublisherUpdate
+from src.book.repository.errors import ReferencedEntityError
+from src.book.service.publisher_service import PublisherService
 
 router = APIRouter(prefix="/publishers", tags=["Publishers"])
 

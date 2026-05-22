@@ -6,10 +6,10 @@ from fastapi.testclient import TestClient
 test_db_path = Path("data/test_books.sqlite3")
 if test_db_path.exists():
     test_db_path.unlink()
-os.environ["BUCH_DB_PATH"] = str(test_db_path)
+os.environ["book_DB_PATH"] = str(test_db_path)
 
-from src.buch.main import app
-from src.buch.service.book_service import book_service
+from src.book.main import app
+from src.book.service.book_service import book_service
 
 
 client = TestClient(app)

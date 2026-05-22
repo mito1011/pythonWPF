@@ -3,8 +3,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 
-from src.buch.router.dependencies import get_book_service
-from src.buch.service.book_service import BookService
+from src.book.router.dependencies import get_book_service
+from src.book.service.book_service import BookService
 
 router = APIRouter()
 BASE_DIR = Path(__file__).resolve().parents[1]

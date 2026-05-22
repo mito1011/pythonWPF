@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from typing import List
 
-from src.buch.router.dependencies import get_author_service
-from src.buch.entity.author_entity import Author, AuthorCreate, AuthorUpdate
-from src.buch.repository.errors import ReferencedEntityError
-from src.buch.service.author_service import AuthorService
+from src.book.router.dependencies import get_author_service
+from src.book.entity.author_entity import Author, AuthorCreate, AuthorUpdate
+from src.book.repository.errors import ReferencedEntityError
+from src.book.service.author_service import AuthorService
 
 router = APIRouter(prefix="/authors", tags=["Authors"])
 

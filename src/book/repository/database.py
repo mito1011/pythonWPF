@@ -7,7 +7,7 @@ from typing import Iterator
 
 class SQLiteDatabase:
     def __init__(self, path: str = "data/books.sqlite3"):
-        self.path = Path(os.environ.get("BUCH_DB_PATH", path))
+        self.path = Path(os.environ.get("book_DB_PATH", path))
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._init_schema()
         self._migrate_schema()

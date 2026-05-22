@@ -1,5 +1,5 @@
 [project]
-name = "wpf-buch-api"
+name = "wpf-book-api"
 version = "0.1.0"
 description = "FastAPI book API with SQLite persistence"
 requires-python = ">=3.11"

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from src.buch.router import book_router, book_write_router, health_router, page_router, author_router, publisher_router
+from src.book.router import book_router, book_write_router, health_router, page_router, author_router, publisher_router
 
 BASE_DIR = Path(__file__).resolve().parent
 

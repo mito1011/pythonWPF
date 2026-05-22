@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 
-from src.buch.router.dependencies import get_book_service
-from src.buch.entity.book_entity import Book
-from src.buch.service.book_service import BookService
+from src.book.router.dependencies import get_book_service
+from src.book.entity.book_entity import Book
+from src.book.service.book_service import BookService
 
 router = APIRouter(prefix="/books", tags=["Books"])
 

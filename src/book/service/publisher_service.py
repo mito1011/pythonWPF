@@ -1,7 +1,7 @@
 from typing import List, Optional
 
-from src.buch.entity.publisher_entity import Publisher, PublisherCreate, PublisherUpdate
-from src.buch.repository.publisher_repository import PublisherSQLiteRepo, publisher_repo
+from src.book.entity.publisher_entity import Publisher, PublisherCreate, PublisherUpdate
+from src.book.repository.publisher_repository import PublisherSQLiteRepo, publisher_repo
 
 
 class PublisherService:

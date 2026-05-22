@@ -740,7 +740,7 @@ wheels = [
 ]
 
 [[package]]
-name = "wpf-buch-api"
+name = "wpf-book-api"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

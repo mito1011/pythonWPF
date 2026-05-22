@@ -19,31 +19,31 @@ uv sync --dev
 
 ## Projektlayout
 
-Das Projekt folgt dem `src/buch`-Layout mit einfachem MVC-Pattern:
+Das Projekt folgt dem `src/book`-Layout mit einfachem MVC-Pattern:
 
-- `src/buch/entity` — Entity- und Request/Response-Modelle (Pydantic)
-- `src/buch/service` — Geschäftslogik
-- `src/buch/repository` — SQLite-Repositories / Datenzugriff
-- `src/buch/router` — REST-Controller (APIRouter)
-- `src/buch/templates` — Jinja2-Templates (Views)
-- `src/buch/static` — statische Assets
+- `src/book/entity` — Entity- und Request/Response-Modelle (Pydantic)
+- `src/book/service` — Geschäftslogik
+- `src/book/repository` — SQLite-Repositories / Datenzugriff
+- `src/book/router` — REST-Controller (APIRouter)
+- `src/book/templates` — Jinja2-Templates (Views)
+- `src/book/static` — statische Assets
 
 ## Starten der Anwendung
 
 ```bash
-uv run uvicorn src.buch.main:app --reload
+uv run uvicorn src.book.main:app --reload
 ```
 
 Die API ist dann unter `http://127.0.0.1:8000` erreichbar.
 
 Die Anwendung nutzt standardmäßig eine SQLite-Datenbank unter `data/books.sqlite3`.
 Beim ersten Start werden Tabellen und Beispieldaten automatisch angelegt.
-Für einen anderen Datenbankpfad kann die Umgebungsvariable `BUCH_DB_PATH` gesetzt werden.
+Für einen anderen Datenbankpfad kann die Umgebungsvariable `book_DB_PATH` gesetzt werden.
 SQLite-Dateien unter `data/` werden nicht versioniert.
 
 ## Mailpit
 
-Beim Anlegen eines Buchs kann die Anwendung optional eine E-Mail an Mailpit senden.
+Beim Anlegen eines books kann die Anwendung optional eine E-Mail an Mailpit senden.
 Die Funktion ist standardmäßig deaktiviert.
 
 Mailpit mit Docker starten:
@@ -55,14 +55,14 @@ docker run --rm -p 8025:8025 -p 1025:1025 axllent/mailpit
 App mit Mail-Benachrichtigung starten:
 
 ```bash
-BUCH_EMAIL_ENABLED=true uv run uvicorn src.buch.main:app --reload
+book_EMAIL_ENABLED=true uv run uvicorn src.book.main:app --reload
 ```
 
 PowerShell:
 
 ```powershell
-$env:BUCH_EMAIL_ENABLED = "true"
-uv run uvicorn src.buch.main:app --reload
+$env:book_EMAIL_ENABLED = "true"
+uv run uvicorn src.book.main:app --reload
 ```
 
 Mailpit UI: `http://127.0.0.1:8025`
