@@ -4,6 +4,11 @@ Dieses Projekt enthält ein einfaches FastAPI-Grundgerüst.
 
 ## Vorbereitung
 
+Voraussetzungen:
+
+- Python >= 3.11
+- `uv`
+
 1. Installiere die Abhängigkeiten mit `uv`:
 
 ```bash
@@ -16,7 +21,7 @@ uv sync --dev
 
 Das Projekt folgt dem `src/buch`-Layout mit einfachem MVC-Pattern:
 
-- `src/buch/entity` — Entitätsklassen (Pydantic)
+- `src/buch/entity` — Entity- und Request/Response-Modelle (Pydantic)
 - `src/buch/service` — Geschäftslogik
 - `src/buch/repository` — SQLite-Repositories / Datenzugriff
 - `src/buch/router` — REST-Controller (APIRouter)
@@ -34,6 +39,7 @@ Die API ist dann unter `http://127.0.0.1:8000` erreichbar.
 Die Anwendung nutzt standardmäßig eine SQLite-Datenbank unter `data/books.sqlite3`.
 Beim ersten Start werden Tabellen und Beispieldaten automatisch angelegt.
 Für einen anderen Datenbankpfad kann die Umgebungsvariable `BUCH_DB_PATH` gesetzt werden.
+SQLite-Dateien unter `data/` werden nicht versioniert.
 
 ## Beispiel-Endpunkte
 

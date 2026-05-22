@@ -1,12 +1,12 @@
-from .autor_service import AutorService, autor_service
+from .author_service import AuthorService, author_service
 from .book_service import BookService, book_service
-from .verlag_service import VerlagService, verlag_service
+from .publisher_service import PublisherService, publisher_service
 
 __all__ = [
-    "AutorService",
-    "autor_service",
+    "AuthorService",
+    "author_service",
     "BookService",
     "book_service",
-    "VerlagService",
-    "verlag_service",
+    "PublisherService",
+    "publisher_service",
 ]

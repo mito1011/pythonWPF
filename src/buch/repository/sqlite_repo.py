@@ -4,9 +4,9 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator, List, Optional
 
-from src.buch.entity.autor_entity import Autor, AutorCreate, AutorUpdate
-from src.buch.entity.buch_entity import Book, BookCreate, BookUpdate
-from src.buch.entity.verlag_entity import Verlag, VerlagCreate, VerlagUpdate
+from src.buch.entity.author_entity import Author, AuthorCreate, AuthorUpdate
+from src.buch.entity.book_entity import Book, BookCreate, BookUpdate
+from src.buch.entity.publisher_entity import Publisher, PublisherCreate, PublisherUpdate
 
 
 class SQLiteDatabase:
@@ -14,6 +14,7 @@ class SQLiteDatabase:
         self.path = Path(os.environ.get("BUCH_DB_PATH", path))
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._init_schema()
+        self._migrate_schema()
         self._seed_data()
 
     @contextmanager
@@ -37,31 +38,73 @@ class SQLiteDatabase:
                 CREATE TABLE IF NOT EXISTS authors (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
-                    vorname TEXT NOT NULL,
-                    geburtsjahr INTEGER,
-                    nationalitaet TEXT
+                    first_name TEXT NOT NULL,
+                    birth_year INTEGER,
+                    nationality TEXT
                 );
 
                 CREATE TABLE IF NOT EXISTS publishers (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
-                    stadt TEXT,
-                    land TEXT,
-                    gruendungsjahr INTEGER
+                    city TEXT,
+                    country TEXT,
+                    founding_year INTEGER
                 );
 
                 CREATE TABLE IF NOT EXISTS books (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT NOT NULL,
-                    autor_id INTEGER NOT NULL,
-                    verlag_id INTEGER NOT NULL,
+                    author_id INTEGER NOT NULL,
+                    publisher_id INTEGER NOT NULL,
                     description TEXT,
-                    publikationsjahr INTEGER,
-                    FOREIGN KEY (autor_id) REFERENCES authors(id) ON DELETE RESTRICT,
-                    FOREIGN KEY (verlag_id) REFERENCES publishers(id) ON DELETE RESTRICT
+                    publication_year INTEGER,
+                    FOREIGN KEY (author_id) REFERENCES authors(id) ON DELETE RESTRICT,
+                    FOREIGN KEY (publisher_id) REFERENCES publishers(id) ON DELETE RESTRICT
                 );
                 """
             )
+
+    def _migrate_schema(self) -> None:
+        with self.connect() as connection:
+            # Keep local databases from earlier versions usable after the English rename.
+            self._rename_columns(
+                connection,
+                "authors",
+                {
+                    "vorname": "first_name",
+                    "geburtsjahr": "birth_year",
+                    "nationalitaet": "nationality",
+                },
+            )
+            self._rename_columns(
+                connection,
+                "publishers",
+                {
+                    "stadt": "city",
+                    "land": "country",
+                    "gruendungsjahr": "founding_year",
+                },
+            )
+            self._rename_columns(
+                connection,
+                "books",
+                {
+                    "autor_id": "author_id",
+                    "verlag_id": "publisher_id",
+                    "publikationsjahr": "publication_year",
+                },
+            )
+
+    def _rename_columns(self, connection: sqlite3.Connection, table: str, columns: dict[str, str]) -> None:
+        existing_columns = {
+            row["name"]
+            for row in connection.execute(f"PRAGMA table_info({table})").fetchall()
+        }
+        for old_name, new_name in columns.items():
+            if old_name in existing_columns and new_name not in existing_columns:
+                connection.execute(f"ALTER TABLE {table} RENAME COLUMN {old_name} TO {new_name}")
+                existing_columns.remove(old_name)
+                existing_columns.add(new_name)
 
     def _seed_data(self) -> None:
         with self.connect() as connection:
@@ -72,212 +115,220 @@ class SQLiteDatabase:
             if author_count == 0:
                 connection.executemany(
                     """
-                    INSERT INTO authors (id, name, vorname, geburtsjahr, nationalitaet)
+                    INSERT INTO authors (id, name, first_name, birth_year, nationality)
                     VALUES (?, ?, ?, ?, ?)
                     """,
                     [
-                        (1, "Saint-Exupéry", "Antoine de", 1900, "Französisch"),
-                        (2, "Goethe", "Johann Wolfgang von", 1749, "Deutsch"),
+                        (1, "Saint-Exupéry", "Antoine de", 1900, "French"),
+                        (2, "Goethe", "Johann Wolfgang von", 1749, "German"),
                     ],
                 )
 
             if publisher_count == 0:
                 connection.executemany(
                     """
-                    INSERT INTO publishers (id, name, stadt, land, gruendungsjahr)
+                    INSERT INTO publishers (id, name, city, country, founding_year)
                     VALUES (?, ?, ?, ?, ?)
                     """,
                     [
-                        (1, "Gallimard", "Paris", "Frankreich", 1911),
-                        (2, "Suhrkamp", "Frankfurt am Main", "Deutschland", 1950),
+                        (1, "Gallimard", "Paris", "France", 1911),
+                        (2, "Suhrkamp", "Frankfurt am Main", "Germany", 1950),
                     ],
                 )
 
             if book_count == 0:
                 connection.executemany(
                     """
-                    INSERT INTO books (id, title, autor_id, verlag_id, description, publikationsjahr)
+                    INSERT INTO books (id, title, author_id, publisher_id, description, publication_year)
                     VALUES (?, ?, ?, ?, ?, ?)
                     """,
                     [
-                        (1, "Der kleine Prinz", 1, 1, "Klassiker", 1943),
+                        (1, "The Little Prince", 1, 1, "Classic", 1943),
                         (2, "Faust", 2, 2, "Drama", 1808),
                     ],
                 )
 
 
-class AutorSQLiteRepo:
+class AuthorSQLiteRepo:
     def __init__(self, database: SQLiteDatabase):
         self.database = database
 
-    def _row_to_autor(self, row: sqlite3.Row) -> Autor:
-        return Autor(
+    def _row_to_author(self, row: sqlite3.Row) -> Author:
+        return Author(
             id=row["id"],
             name=row["name"],
-            vorname=row["vorname"],
-            geburtsjahr=row["geburtsjahr"],
-            nationalitaet=row["nationalitaet"],
+            first_name=row["first_name"],
+            birth_year=row["birth_year"],
+            nationality=row["nationality"],
         )
 
-    def get_all(self) -> List[Autor]:
+    def get_all(self) -> List[Author]:
         with self.database.connect() as connection:
             rows = connection.execute("SELECT * FROM authors ORDER BY id").fetchall()
-            return [self._row_to_autor(row) for row in rows]
+            return [self._row_to_author(row) for row in rows]
 
-    def get_by_id(self, autor_id: int) -> Optional[Autor]:
+    def get_by_id(self, author_id: int) -> Optional[Author]:
         with self.database.connect() as connection:
-            row = connection.execute("SELECT * FROM authors WHERE id = ?", (autor_id,)).fetchone()
-            return self._row_to_autor(row) if row else None
+            row = connection.execute("SELECT * FROM authors WHERE id = ?", (author_id,)).fetchone()
+            return self._row_to_author(row) if row else None
 
-    def create(self, autor_in: AutorCreate) -> Autor:
+    def create(self, author_in: AuthorCreate) -> Author:
         with self.database.connect() as connection:
             cursor = connection.execute(
                 """
-                INSERT INTO authors (name, vorname, geburtsjahr, nationalitaet)
+                INSERT INTO authors (name, first_name, birth_year, nationality)
                 VALUES (?, ?, ?, ?)
                 """,
-                (autor_in.name, autor_in.vorname, autor_in.geburtsjahr, autor_in.nationalitaet),
+                (author_in.name, author_in.first_name, author_in.birth_year, author_in.nationality),
             )
-            autor_id = cursor.lastrowid
-        return self.get_by_id(autor_id)
+            author_id = cursor.lastrowid
+        author = self.get_by_id(author_id)
+        if author is None:
+            raise RuntimeError("Created author could not be loaded")
+        return author
 
-    def update(self, autor_id: int, autor_in: AutorCreate) -> Optional[Autor]:
+    def update(self, author_id: int, author_in: AuthorCreate) -> Optional[Author]:
         with self.database.connect() as connection:
             cursor = connection.execute(
                 """
                 UPDATE authors
-                SET name = ?, vorname = ?, geburtsjahr = ?, nationalitaet = ?
+                SET name = ?, first_name = ?, birth_year = ?, nationality = ?
                 WHERE id = ?
                 """,
-                (autor_in.name, autor_in.vorname, autor_in.geburtsjahr, autor_in.nationalitaet, autor_id),
+                (author_in.name, author_in.first_name, author_in.birth_year, author_in.nationality, author_id),
             )
             if cursor.rowcount == 0:
                 return None
-        return self.get_by_id(autor_id)
+        return self.get_by_id(author_id)
 
-    def patch(self, autor_id: int, autor_in: AutorUpdate) -> Optional[Autor]:
-        autor = self.get_by_id(autor_id)
-        if not autor:
+    def patch(self, author_id: int, author_in: AuthorUpdate) -> Optional[Author]:
+        author = self.get_by_id(author_id)
+        if not author:
             return None
 
-        data = autor_in.model_dump(exclude_unset=True)
+        data = author_in.model_dump(exclude_unset=True)
         if not data:
-            return autor
+            return author
 
-        assignments = ", ".join(f"{field} = ?" for field in data)
-        values = list(data.values()) + [autor_id]
+        allowed_fields = {"name", "first_name", "birth_year", "nationality"}
+        assignments = ", ".join(f"{field} = ?" for field in data if field in allowed_fields)
+        values = [value for field, value in data.items() if field in allowed_fields] + [author_id]
         with self.database.connect() as connection:
             connection.execute(f"UPDATE authors SET {assignments} WHERE id = ?", values)
-        return self.get_by_id(autor_id)
+        return self.get_by_id(author_id)
 
-    def delete(self, autor_id: int) -> bool:
+    def delete(self, author_id: int) -> bool:
         try:
             with self.database.connect() as connection:
-                cursor = connection.execute("DELETE FROM authors WHERE id = ?", (autor_id,))
+                cursor = connection.execute("DELETE FROM authors WHERE id = ?", (author_id,))
                 return cursor.rowcount > 0
         except sqlite3.IntegrityError:
             return False
 
 
-class VerlagSQLiteRepo:
+class PublisherSQLiteRepo:
     def __init__(self, database: SQLiteDatabase):
         self.database = database
 
-    def _row_to_verlag(self, row: sqlite3.Row) -> Verlag:
-        return Verlag(
+    def _row_to_publisher(self, row: sqlite3.Row) -> Publisher:
+        return Publisher(
             id=row["id"],
             name=row["name"],
-            stadt=row["stadt"],
-            land=row["land"],
-            gruendungsjahr=row["gruendungsjahr"],
+            city=row["city"],
+            country=row["country"],
+            founding_year=row["founding_year"],
         )
 
-    def get_all(self) -> List[Verlag]:
+    def get_all(self) -> List[Publisher]:
         with self.database.connect() as connection:
             rows = connection.execute("SELECT * FROM publishers ORDER BY id").fetchall()
-            return [self._row_to_verlag(row) for row in rows]
+            return [self._row_to_publisher(row) for row in rows]
 
-    def get_by_id(self, verlag_id: int) -> Optional[Verlag]:
+    def get_by_id(self, publisher_id: int) -> Optional[Publisher]:
         with self.database.connect() as connection:
-            row = connection.execute("SELECT * FROM publishers WHERE id = ?", (verlag_id,)).fetchone()
-            return self._row_to_verlag(row) if row else None
+            row = connection.execute("SELECT * FROM publishers WHERE id = ?", (publisher_id,)).fetchone()
+            return self._row_to_publisher(row) if row else None
 
-    def create(self, verlag_in: VerlagCreate) -> Verlag:
+    def create(self, publisher_in: PublisherCreate) -> Publisher:
         with self.database.connect() as connection:
             cursor = connection.execute(
                 """
-                INSERT INTO publishers (name, stadt, land, gruendungsjahr)
+                INSERT INTO publishers (name, city, country, founding_year)
                 VALUES (?, ?, ?, ?)
                 """,
-                (verlag_in.name, verlag_in.stadt, verlag_in.land, verlag_in.gruendungsjahr),
+                (publisher_in.name, publisher_in.city, publisher_in.country, publisher_in.founding_year),
             )
-            verlag_id = cursor.lastrowid
-        return self.get_by_id(verlag_id)
+            publisher_id = cursor.lastrowid
+        publisher = self.get_by_id(publisher_id)
+        if publisher is None:
+            raise RuntimeError("Created publisher could not be loaded")
+        return publisher
 
-    def update(self, verlag_id: int, verlag_in: VerlagCreate) -> Optional[Verlag]:
+    def update(self, publisher_id: int, publisher_in: PublisherCreate) -> Optional[Publisher]:
         with self.database.connect() as connection:
             cursor = connection.execute(
                 """
                 UPDATE publishers
-                SET name = ?, stadt = ?, land = ?, gruendungsjahr = ?
+                SET name = ?, city = ?, country = ?, founding_year = ?
                 WHERE id = ?
                 """,
-                (verlag_in.name, verlag_in.stadt, verlag_in.land, verlag_in.gruendungsjahr, verlag_id),
+                (publisher_in.name, publisher_in.city, publisher_in.country, publisher_in.founding_year, publisher_id),
             )
             if cursor.rowcount == 0:
                 return None
-        return self.get_by_id(verlag_id)
+        return self.get_by_id(publisher_id)
 
-    def patch(self, verlag_id: int, verlag_in: VerlagUpdate) -> Optional[Verlag]:
-        verlag = self.get_by_id(verlag_id)
-        if not verlag:
+    def patch(self, publisher_id: int, publisher_in: PublisherUpdate) -> Optional[Publisher]:
+        publisher = self.get_by_id(publisher_id)
+        if not publisher:
             return None
 
-        data = verlag_in.model_dump(exclude_unset=True)
+        data = publisher_in.model_dump(exclude_unset=True)
         if not data:
-            return verlag
+            return publisher
 
-        assignments = ", ".join(f"{field} = ?" for field in data)
-        values = list(data.values()) + [verlag_id]
+        allowed_fields = {"name", "city", "country", "founding_year"}
+        assignments = ", ".join(f"{field} = ?" for field in data if field in allowed_fields)
+        values = [value for field, value in data.items() if field in allowed_fields] + [publisher_id]
         with self.database.connect() as connection:
             connection.execute(f"UPDATE publishers SET {assignments} WHERE id = ?", values)
-        return self.get_by_id(verlag_id)
+        return self.get_by_id(publisher_id)
 
-    def delete(self, verlag_id: int) -> bool:
+    def delete(self, publisher_id: int) -> bool:
         try:
             with self.database.connect() as connection:
-                cursor = connection.execute("DELETE FROM publishers WHERE id = ?", (verlag_id,))
+                cursor = connection.execute("DELETE FROM publishers WHERE id = ?", (publisher_id,))
                 return cursor.rowcount > 0
         except sqlite3.IntegrityError:
             return False
 
 
 class BookSQLiteRepo:
-    def __init__(self, database: SQLiteDatabase, autor_repo: AutorSQLiteRepo, verlag_repo: VerlagSQLiteRepo):
+    def __init__(self, database: SQLiteDatabase, author_repo: AuthorSQLiteRepo, publisher_repo: PublisherSQLiteRepo):
         self.database = database
-        self.autor_repo = autor_repo
-        self.verlag_repo = verlag_repo
+        self.author_repo = author_repo
+        self.publisher_repo = publisher_repo
 
     def _row_to_book(self, row: sqlite3.Row) -> Book:
         return Book(
             id=row["book_id"],
             title=row["title"],
-            autor=Autor(
-                id=row["autor_id"],
-                name=row["autor_name"],
-                vorname=row["autor_vorname"],
-                geburtsjahr=row["autor_geburtsjahr"],
-                nationalitaet=row["autor_nationalitaet"],
+            author=Author(
+                id=row["author_id"],
+                name=row["author_name"],
+                first_name=row["author_first_name"],
+                birth_year=row["author_birth_year"],
+                nationality=row["author_nationality"],
             ),
-            verlag=Verlag(
-                id=row["verlag_id"],
-                name=row["verlag_name"],
-                stadt=row["verlag_stadt"],
-                land=row["verlag_land"],
-                gruendungsjahr=row["verlag_gruendungsjahr"],
+            publisher=Publisher(
+                id=row["publisher_id"],
+                name=row["publisher_name"],
+                city=row["publisher_city"],
+                country=row["publisher_country"],
+                founding_year=row["publisher_founding_year"],
             ),
             description=row["description"],
-            publikationsjahr=row["publikationsjahr"],
+            publication_year=row["publication_year"],
         )
 
     def _select_books_sql(self) -> str:
@@ -286,20 +337,20 @@ class BookSQLiteRepo:
                 books.id AS book_id,
                 books.title,
                 books.description,
-                books.publikationsjahr,
-                authors.id AS autor_id,
-                authors.name AS autor_name,
-                authors.vorname AS autor_vorname,
-                authors.geburtsjahr AS autor_geburtsjahr,
-                authors.nationalitaet AS autor_nationalitaet,
-                publishers.id AS verlag_id,
-                publishers.name AS verlag_name,
-                publishers.stadt AS verlag_stadt,
-                publishers.land AS verlag_land,
-                publishers.gruendungsjahr AS verlag_gruendungsjahr
+                books.publication_year,
+                authors.id AS author_id,
+                authors.name AS author_name,
+                authors.first_name AS author_first_name,
+                authors.birth_year AS author_birth_year,
+                authors.nationality AS author_nationality,
+                publishers.id AS publisher_id,
+                publishers.name AS publisher_name,
+                publishers.city AS publisher_city,
+                publishers.country AS publisher_country,
+                publishers.founding_year AS publisher_founding_year
             FROM books
-            JOIN authors ON authors.id = books.autor_id
-            JOIN publishers ON publishers.id = books.verlag_id
+            JOIN authors ON authors.id = books.author_id
+            JOIN publishers ON publishers.id = books.publisher_id
         """
 
     def get_all(self) -> List[Book]:
@@ -316,34 +367,37 @@ class BookSQLiteRepo:
         with self.database.connect() as connection:
             cursor = connection.execute(
                 """
-                INSERT INTO books (title, autor_id, verlag_id, description, publikationsjahr)
+                INSERT INTO books (title, author_id, publisher_id, description, publication_year)
                 VALUES (?, ?, ?, ?, ?)
                 """,
                 (
                     book_in.title,
-                    book_in.autor_id,
-                    book_in.verlag_id,
+                    book_in.author_id,
+                    book_in.publisher_id,
                     book_in.description,
-                    book_in.publikationsjahr,
+                    book_in.publication_year,
                 ),
             )
             book_id = cursor.lastrowid
-        return self.get_by_id(book_id)
+        book = self.get_by_id(book_id)
+        if book is None:
+            raise RuntimeError("Created book could not be loaded")
+        return book
 
     def update(self, book_id: int, book_in: BookCreate) -> Optional[Book]:
         with self.database.connect() as connection:
             cursor = connection.execute(
                 """
                 UPDATE books
-                SET title = ?, autor_id = ?, verlag_id = ?, description = ?, publikationsjahr = ?
+                SET title = ?, author_id = ?, publisher_id = ?, description = ?, publication_year = ?
                 WHERE id = ?
                 """,
                 (
                     book_in.title,
-                    book_in.autor_id,
-                    book_in.verlag_id,
+                    book_in.author_id,
+                    book_in.publisher_id,
                     book_in.description,
-                    book_in.publikationsjahr,
+                    book_in.publication_year,
                     book_id,
                 ),
             )
@@ -360,8 +414,9 @@ class BookSQLiteRepo:
         if not data:
             return book
 
-        assignments = ", ".join(f"{field} = ?" for field in data)
-        values = list(data.values()) + [book_id]
+        allowed_fields = {"title", "author_id", "publisher_id", "description", "publication_year"}
+        assignments = ", ".join(f"{field} = ?" for field in data if field in allowed_fields)
+        values = [value for field, value in data.items() if field in allowed_fields] + [book_id]
         with self.database.connect() as connection:
             connection.execute(f"UPDATE books SET {assignments} WHERE id = ?", values)
         return self.get_by_id(book_id)
@@ -373,6 +428,6 @@ class BookSQLiteRepo:
 
 
 database = SQLiteDatabase()
-autor_repo = AutorSQLiteRepo(database)
-verlag_repo = VerlagSQLiteRepo(database)
-repo = BookSQLiteRepo(database, autor_repo, verlag_repo)
+author_repo = AuthorSQLiteRepo(database)
+publisher_repo = PublisherSQLiteRepo(database)
+repo = BookSQLiteRepo(database, author_repo, publisher_repo)

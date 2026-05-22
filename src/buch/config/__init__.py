@@ -1,1 +1,0 @@
-# book config package

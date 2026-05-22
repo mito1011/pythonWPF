@@ -1,1 +1,0 @@
-# book graphql api placeholder
