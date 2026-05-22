@@ -15,3 +15,10 @@ class VerlagCreate(BaseModel):
     stadt: Optional[str] = None
     land: Optional[str] = None
     gruendungsjahr: Optional[int] = None
+
+
+class VerlagUpdate(BaseModel):
+    name: Optional[str] = None
+    stadt: Optional[str] = None
+    land: Optional[str] = None
+    gruendungsjahr: Optional[int] = None

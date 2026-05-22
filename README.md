@@ -32,7 +32,8 @@ pip install -r requirements.txt
 Das Projekt folgt dem `src/buch`-Layout mit einfachem MVC-Pattern:
 
 - `src/buch/entity` — Entitätsklassen (Pydantic)
-- `src/buch/repository` — Mock-Repositories / Geschäftslogik
+- `src/buch/service` — Geschäftslogik
+- `src/buch/repository` — Mock-Repositories / Datenzugriff
 - `src/buch/router` — REST-Controller (APIRouter)
 - `src/buch/templates` — Jinja2-Templates (Views)
 - `src/buch/static` — statische Assets
@@ -54,6 +55,16 @@ Die API ist dann unter `http://127.0.0.1:8000` erreichbar.
 - `PUT /books/{book_id}`
 - `PATCH /books/{book_id}`
 - `DELETE /books/{book_id}`
+- `GET /autoren`
+- `POST /autoren`
+- `PUT /autoren/{autor_id}`
+- `PATCH /autoren/{autor_id}`
+- `DELETE /autoren/{autor_id}`
+- `GET /verlage`
+- `POST /verlage`
+- `PUT /verlage/{verlag_id}`
+- `PATCH /verlage/{verlag_id}`
+- `DELETE /verlage/{verlag_id}`
 - `GET /books/view`
 
 Swagger UI: `http://127.0.0.1:8000/docs`

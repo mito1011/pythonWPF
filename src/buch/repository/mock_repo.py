@@ -1,11 +1,7 @@
 from typing import List, Optional
-from src.buch.entity.buch_entity import Book, BookCreate
-from src.buch.entity.autor_entity import Autor, AutorCreate
-from src.buch.entity.verlag_entity import Verlag, VerlagCreate
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from src.buch.router.buch_update_model import BookUpdate
+from src.buch.entity.buch_entity import Book, BookCreate, BookUpdate
+from src.buch.entity.autor_entity import Autor, AutorCreate, AutorUpdate
+from src.buch.entity.verlag_entity import Verlag, VerlagCreate, VerlagUpdate
 
 
 class AutorMockRepo:
@@ -26,10 +22,43 @@ class AutorMockRepo:
         return None
 
     def create(self, autor_in: AutorCreate) -> Autor:
-        autor = Autor(id=self._next, **autor_in.dict())
+        autor = Autor(id=self._next, **autor_in.model_dump())
         self._autoren.append(autor)
         self._next += 1
         return autor
+
+    def update(self, autor_id: int, autor_in: AutorCreate) -> Optional[Autor]:
+        autor = self.get_by_id(autor_id)
+        if not autor:
+            return None
+
+        autor.name = autor_in.name
+        autor.vorname = autor_in.vorname
+        autor.geburtsjahr = autor_in.geburtsjahr
+        autor.nationalitaet = autor_in.nationalitaet
+        return autor
+
+    def patch(self, autor_id: int, autor_in: AutorUpdate) -> Optional[Autor]:
+        autor = self.get_by_id(autor_id)
+        if not autor:
+            return None
+
+        if autor_in.name is not None:
+            autor.name = autor_in.name
+        if autor_in.vorname is not None:
+            autor.vorname = autor_in.vorname
+        if autor_in.geburtsjahr is not None:
+            autor.geburtsjahr = autor_in.geburtsjahr
+        if autor_in.nationalitaet is not None:
+            autor.nationalitaet = autor_in.nationalitaet
+        return autor
+
+    def delete(self, autor_id: int) -> bool:
+        for i, autor in enumerate(self._autoren):
+            if autor.id == autor_id:
+                self._autoren.pop(i)
+                return True
+        return False
 
 
 class VerlagMockRepo:
@@ -50,10 +79,43 @@ class VerlagMockRepo:
         return None
 
     def create(self, verlag_in: VerlagCreate) -> Verlag:
-        verlag = Verlag(id=self._next, **verlag_in.dict())
+        verlag = Verlag(id=self._next, **verlag_in.model_dump())
         self._verlage.append(verlag)
         self._next += 1
         return verlag
+
+    def update(self, verlag_id: int, verlag_in: VerlagCreate) -> Optional[Verlag]:
+        verlag = self.get_by_id(verlag_id)
+        if not verlag:
+            return None
+
+        verlag.name = verlag_in.name
+        verlag.stadt = verlag_in.stadt
+        verlag.land = verlag_in.land
+        verlag.gruendungsjahr = verlag_in.gruendungsjahr
+        return verlag
+
+    def patch(self, verlag_id: int, verlag_in: VerlagUpdate) -> Optional[Verlag]:
+        verlag = self.get_by_id(verlag_id)
+        if not verlag:
+            return None
+
+        if verlag_in.name is not None:
+            verlag.name = verlag_in.name
+        if verlag_in.stadt is not None:
+            verlag.stadt = verlag_in.stadt
+        if verlag_in.land is not None:
+            verlag.land = verlag_in.land
+        if verlag_in.gruendungsjahr is not None:
+            verlag.gruendungsjahr = verlag_in.gruendungsjahr
+        return verlag
+
+    def delete(self, verlag_id: int) -> bool:
+        for i, verlag in enumerate(self._verlage):
+            if verlag.id == verlag_id:
+                self._verlage.pop(i)
+                return True
+        return False
 
 
 class BookMockRepo:
@@ -135,7 +197,7 @@ class BookMockRepo:
         book.publikationsjahr = book_in.publikationsjahr
         return book
 
-    def patch(self, book_id: int, book_in: "BookUpdate") -> Optional[Book]:
+    def patch(self, book_id: int, book_in: BookUpdate) -> Optional[Book]:
         book = self.get_by_id(book_id)
         if not book:
             return None

@@ -19,3 +19,10 @@ class AutorCreate(BaseModel):
     vorname: str
     geburtsjahr: Optional[int] = None
     nationalitaet: Optional[str] = None
+
+
+class AutorUpdate(BaseModel):
+    name: Optional[str] = None
+    vorname: Optional[str] = None
+    geburtsjahr: Optional[int] = None
+    nationalitaet: Optional[str] = None

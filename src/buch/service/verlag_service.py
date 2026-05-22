@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from src.buch.entity.verlag_entity import Verlag, VerlagCreate
+from src.buch.entity.verlag_entity import Verlag, VerlagCreate, VerlagUpdate
 from src.buch.repository.mock_repo import VerlagMockRepo
 
 
@@ -16,6 +16,15 @@ class VerlagService:
 
     def create(self, verlag_in: VerlagCreate) -> Verlag:
         return self.verlag_repo.create(verlag_in)
+
+    def update(self, verlag_id: int, verlag_in: VerlagCreate) -> Optional[Verlag]:
+        return self.verlag_repo.update(verlag_id, verlag_in)
+
+    def patch(self, verlag_id: int, verlag_in: VerlagUpdate) -> Optional[Verlag]:
+        return self.verlag_repo.patch(verlag_id, verlag_in)
+
+    def delete(self, verlag_id: int) -> bool:
+        return self.verlag_repo.delete(verlag_id)
 
 
 from src.buch.repository.mock_repo import verlag_repo

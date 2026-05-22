@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from typing import List
 
 from src.buch.router.dependencies import get_verlag_service
-from src.buch.entity.verlag_entity import Verlag, VerlagCreate
+from src.buch.entity.verlag_entity import Verlag, VerlagCreate, VerlagUpdate
 from src.buch.service.verlag_service import VerlagService
 
 router = APIRouter(prefix="/verlage", tags=["Verlage"])
@@ -21,6 +21,30 @@ def get_verlag(verlag_id: int, service: VerlagService = Depends(get_verlag_servi
     return v
 
 
-@router.post("/", response_model=Verlag)
+@router.post("/", response_model=Verlag, status_code=status.HTTP_201_CREATED)
 def create_verlag(verlag: VerlagCreate, service: VerlagService = Depends(get_verlag_service)):
     return service.create(verlag)
+
+
+@router.put("/{verlag_id}", response_model=Verlag)
+def update_verlag(verlag_id: int, verlag: VerlagCreate, service: VerlagService = Depends(get_verlag_service)):
+    updated_verlag = service.update(verlag_id, verlag)
+    if not updated_verlag:
+        raise HTTPException(status_code=404, detail="Verlag not found")
+    return updated_verlag
+
+
+@router.patch("/{verlag_id}", response_model=Verlag)
+def patch_verlag(verlag_id: int, verlag: VerlagUpdate, service: VerlagService = Depends(get_verlag_service)):
+    patched_verlag = service.patch(verlag_id, verlag)
+    if not patched_verlag:
+        raise HTTPException(status_code=404, detail="Verlag not found")
+    return patched_verlag
+
+
+@router.delete("/{verlag_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_verlag(verlag_id: int, service: VerlagService = Depends(get_verlag_service)):
+    deleted = service.delete(verlag_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Verlag not found")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

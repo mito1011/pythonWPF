@@ -1,11 +1,8 @@
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional
 
-from src.buch.entity.buch_entity import Book, BookCreate
+from src.buch.entity.buch_entity import Book, BookCreate, BookUpdate
 from src.buch.repository.mock_repo import AutorMockRepo, BookMockRepo, VerlagMockRepo
 from src.buch.repository.mock_repo import autor_repo, repo as book_repo, verlag_repo
-
-if TYPE_CHECKING:
-    from src.buch.router.buch_update_model import BookUpdate
 
 class BookService:
     def __init__(self, book_repo: BookMockRepo, autor_repo: AutorMockRepo, verlag_repo: VerlagMockRepo):
@@ -37,7 +34,7 @@ class BookService:
             raise ValueError("Verlag nicht gefunden")
         return self.book_repo.update(book_id, book_in)
 
-    def patch(self, book_id: int, book_in: "BookUpdate") -> Optional[Book]:
+    def patch(self, book_id: int, book_in: BookUpdate) -> Optional[Book]:
         if hasattr(book_in, "autor_id") and book_in.autor_id is not None:
             autor = self.autor_repo.get_by_id(book_in.autor_id)
             if not autor:
