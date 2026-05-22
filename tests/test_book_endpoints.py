@@ -9,9 +9,19 @@ if test_db_path.exists():
 os.environ["BUCH_DB_PATH"] = str(test_db_path)
 
 from src.buch.main import app
+from src.buch.service.book_service import book_service
 
 
 client = TestClient(app)
+
+
+class RecordingEmailNotifier:
+    def __init__(self):
+        self.sent_books = []
+
+    def send_book_created(self, book):
+        self.sent_books.append(book)
+        return True
 
 
 def test_health_live():
@@ -84,6 +94,30 @@ def test_create_update_patch_and_delete_book():
 
     assert delete_response.status_code == 204
     assert client.get(f"/books/{book_id}").status_code == 404
+
+
+def test_create_book_sends_notification():
+    original_notifier = book_service.email_notifier
+    recording_notifier = RecordingEmailNotifier()
+    book_service.email_notifier = recording_notifier
+
+    try:
+        create_response = client.post(
+            "/books/",
+            json={
+                "title": "Notification Test Book",
+                "author_id": 1,
+                "publisher_id": 1,
+            },
+        )
+        book_id = create_response.json()["id"]
+    finally:
+        book_service.email_notifier = original_notifier
+
+    assert create_response.status_code == 201
+    assert len(recording_notifier.sent_books) == 1
+    assert recording_notifier.sent_books[0].title == "Notification Test Book"
+    assert client.delete(f"/books/{book_id}").status_code == 204
 
 
 def test_book_error_responses():

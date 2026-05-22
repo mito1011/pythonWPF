@@ -41,6 +41,32 @@ Beim ersten Start werden Tabellen und Beispieldaten automatisch angelegt.
 Für einen anderen Datenbankpfad kann die Umgebungsvariable `BUCH_DB_PATH` gesetzt werden.
 SQLite-Dateien unter `data/` werden nicht versioniert.
 
+## Mailpit
+
+Beim Anlegen eines Buchs kann die Anwendung optional eine E-Mail an Mailpit senden.
+Die Funktion ist standardmäßig deaktiviert.
+
+Mailpit mit Docker starten:
+
+```bash
+docker run --rm -p 8025:8025 -p 1025:1025 axllent/mailpit
+```
+
+App mit Mail-Benachrichtigung starten:
+
+```bash
+BUCH_EMAIL_ENABLED=true uv run uvicorn src.buch.main:app --reload
+```
+
+PowerShell:
+
+```powershell
+$env:BUCH_EMAIL_ENABLED = "true"
+uv run uvicorn src.buch.main:app --reload
+```
+
+Mailpit UI: `http://127.0.0.1:8025`
+
 ## Beispiel-Endpunkte
 
 - `GET /`

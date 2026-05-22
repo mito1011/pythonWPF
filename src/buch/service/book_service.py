@@ -4,12 +4,20 @@ from src.buch.entity.book_entity import Book, BookCreate, BookUpdate
 from src.buch.repository.author_repository import AuthorSQLiteRepo, author_repo
 from src.buch.repository.book_repository import BookSQLiteRepo, repo as book_repo
 from src.buch.repository.publisher_repository import PublisherSQLiteRepo, publisher_repo
+from src.buch.service.email_service import EmailNotifier, email_notifier
 
 class BookService:
-    def __init__(self, book_repo: BookSQLiteRepo, author_repo: AuthorSQLiteRepo, publisher_repo: PublisherSQLiteRepo):
+    def __init__(
+        self,
+        book_repo: BookSQLiteRepo,
+        author_repo: AuthorSQLiteRepo,
+        publisher_repo: PublisherSQLiteRepo,
+        email_notifier: EmailNotifier,
+    ):
         self.book_repo = book_repo
         self.author_repo = author_repo
         self.publisher_repo = publisher_repo
+        self.email_notifier = email_notifier
 
     def get_all(self) -> List[Book]:
         return self.book_repo.get_all()
@@ -24,7 +32,9 @@ class BookService:
             raise ValueError("Author not found")
         if not publisher:
             raise ValueError("Publisher not found")
-        return self.book_repo.create(book_in)
+        book = self.book_repo.create(book_in)
+        self.email_notifier.send_book_created(book)
+        return book
 
     def update(self, book_id: int, book_in: BookCreate) -> Optional[Book]:
         author = self.author_repo.get_by_id(book_in.author_id)
@@ -52,4 +62,9 @@ class BookService:
 
 
 
-book_service = BookService(book_repo=book_repo, author_repo=author_repo, publisher_repo=publisher_repo)
+book_service = BookService(
+    book_repo=book_repo,
+    author_repo=author_repo,
+    publisher_repo=publisher_repo,
+    email_notifier=email_notifier,
+)
