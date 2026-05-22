@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from src.buch.entity.autor_entity import Autor, AutorCreate
 from src.buch.repository.mock_repo import AutorMockRepo
-
+from src.buch.repository.mock_repo import autor_repo
 
 class AutorService:
     def __init__(self, autor_repo: AutorMockRepo):
@@ -18,5 +18,5 @@ class AutorService:
         return self.autor_repo.create(autor_in)
 
 
-from src.buch.repository.mock_repo import autor_repo
+
 autor_service = AutorService(autor_repo=autor_repo)

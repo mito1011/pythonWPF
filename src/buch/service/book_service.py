@@ -1,8 +1,11 @@
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
 from src.buch.entity.buch_entity import Book, BookCreate
 from src.buch.repository.mock_repo import AutorMockRepo, BookMockRepo, VerlagMockRepo
+from src.buch.repository.mock_repo import autor_repo, repo as book_repo, verlag_repo
 
+if TYPE_CHECKING:
+    from src.buch.router.buch_update_model import BookUpdate
 
 class BookService:
     def __init__(self, book_repo: BookMockRepo, autor_repo: AutorMockRepo, verlag_repo: VerlagMockRepo):
@@ -49,6 +52,6 @@ class BookService:
         return self.book_repo.delete(book_id)
 
 
-# service singleton is initialized from the shared repository singletons
-from src.buch.repository.mock_repo import autor_repo, repo as book_repo, verlag_repo
+
+
 book_service = BookService(book_repo=book_repo, autor_repo=autor_repo, verlag_repo=verlag_repo)
