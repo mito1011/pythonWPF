@@ -1,11 +1,11 @@
 from typing import List, Optional
 
 from src.buch.entity.verlag_entity import Verlag, VerlagCreate, VerlagUpdate
-from src.buch.repository.mock_repo import VerlagMockRepo
+from src.buch.repository.sqlite_repo import VerlagSQLiteRepo
 
 
 class VerlagService:
-    def __init__(self, verlag_repo: VerlagMockRepo):
+    def __init__(self, verlag_repo: VerlagSQLiteRepo):
         self.verlag_repo = verlag_repo
 
     def get_all(self) -> List[Verlag]:
@@ -27,5 +27,5 @@ class VerlagService:
         return self.verlag_repo.delete(verlag_id)
 
 
-from src.buch.repository.mock_repo import verlag_repo
+from src.buch.repository.sqlite_repo import verlag_repo
 verlag_service = VerlagService(verlag_repo=verlag_repo)

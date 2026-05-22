@@ -5,7 +5,7 @@
     <title>Bücher</title>
   </head>
   <body>
-    <h1>Bücher (Mock)</h1>
+    <h1>Bücher</h1>
     <ul>
       {% for book in books %}
         <li><a href="/books/{{ book.id }}"><strong>{{ book.title }}</strong></a> von {{ book.autor.full_name }} ({{ book.verlag.name }})</li>

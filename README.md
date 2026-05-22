@@ -33,7 +33,7 @@ Das Projekt folgt dem `src/buch`-Layout mit einfachem MVC-Pattern:
 
 - `src/buch/entity` — Entitätsklassen (Pydantic)
 - `src/buch/service` — Geschäftslogik
-- `src/buch/repository` — Mock-Repositories / Datenzugriff
+- `src/buch/repository` — SQLite-Repositories / Datenzugriff
 - `src/buch/router` — REST-Controller (APIRouter)
 - `src/buch/templates` — Jinja2-Templates (Views)
 - `src/buch/static` — statische Assets
@@ -45,6 +45,10 @@ uvicorn src.buch.main:app --reload
 ```
 
 Die API ist dann unter `http://127.0.0.1:8000` erreichbar.
+
+Die Anwendung nutzt standardmäßig eine SQLite-Datenbank unter `data/books.sqlite3`.
+Beim ersten Start werden Tabellen und Beispieldaten automatisch angelegt.
+Für einen anderen Datenbankpfad kann die Umgebungsvariable `BUCH_DB_PATH` gesetzt werden.
 
 ## Beispiel-Endpunkte
 

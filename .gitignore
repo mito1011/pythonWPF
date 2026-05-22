@@ -11,3 +11,7 @@ ENV/
 
 # IDE
 .vscode/
+
+# SQLite databases
+data/*.sqlite3
+data/*.sqlite3-*

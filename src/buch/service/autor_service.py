@@ -1,11 +1,11 @@
 from typing import List, Optional
 
 from src.buch.entity.autor_entity import Autor, AutorCreate, AutorUpdate
-from src.buch.repository.mock_repo import AutorMockRepo
-from src.buch.repository.mock_repo import autor_repo
+from src.buch.repository.sqlite_repo import AutorSQLiteRepo
+from src.buch.repository.sqlite_repo import autor_repo
 
 class AutorService:
-    def __init__(self, autor_repo: AutorMockRepo):
+    def __init__(self, autor_repo: AutorSQLiteRepo):
         self.autor_repo = autor_repo
 
     def get_all(self) -> List[Autor]:
