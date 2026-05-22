@@ -1,8 +1,7 @@
 from typing import List, Optional
 
 from src.buch.entity.author_entity import Author, AuthorCreate, AuthorUpdate
-from src.buch.repository.sqlite_repo import AuthorSQLiteRepo
-from src.buch.repository.sqlite_repo import author_repo
+from src.buch.repository.author_repository import AuthorSQLiteRepo, author_repo
 
 
 class AuthorService:

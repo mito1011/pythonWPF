@@ -1,8 +1,9 @@
 from typing import List, Optional
 
 from src.buch.entity.book_entity import Book, BookCreate, BookUpdate
-from src.buch.repository.sqlite_repo import AuthorSQLiteRepo, BookSQLiteRepo, PublisherSQLiteRepo
-from src.buch.repository.sqlite_repo import author_repo, repo as book_repo, publisher_repo
+from src.buch.repository.author_repository import AuthorSQLiteRepo, author_repo
+from src.buch.repository.book_repository import BookSQLiteRepo, repo as book_repo
+from src.buch.repository.publisher_repository import PublisherSQLiteRepo, publisher_repo
 
 class BookService:
     def __init__(self, book_repo: BookSQLiteRepo, author_repo: AuthorSQLiteRepo, publisher_repo: PublisherSQLiteRepo):
