@@ -8,7 +8,7 @@
     <h1>Bücher (Mock)</h1>
     <ul>
       {% for book in books %}
-        <li><a href="/books/{{ book.id }}"><strong>{{ book.title }}</strong></a> von {{ book.author }}</li>
+        <li><a href="/books/{{ book.id }}"><strong>{{ book.title }}</strong></a> von {{ book.autor.full_name }} ({{ book.verlag.name }})</li>
       {% endfor %}
     </ul>
   </body>
